@@ -8,7 +8,7 @@ class Program
 
     private static void MainMenu()
     {
-        Menu mainMenu = new Menu(new string[] { "Show All Persons", "Create Person", "-", "Exit" });
+        Menu mainMenu = new Menu(new string[] { "Show All Persons", "Create Person", "Create Project", "Exit" });
         int selectedIndex = mainMenu.DisplayMenu("Select an Option");
         bool showMenu = true;
         while (showMenu)
@@ -24,8 +24,8 @@ class Program
                     selectedIndex = mainMenu.DisplayMenu();
                     break;
                 case 2:
-                    //SignIn(email, pincode);
-                    showMenu = false;
+                    CreateProjectMenu();
+                    selectedIndex = mainMenu.DisplayMenu();
                     break;
                 case 3:
                     Environment.ExitCode = 0;
@@ -71,6 +71,42 @@ class Program
         Helper.EnterToContinue();
     }
 
+    private static void CreateProjectMenu()
+    {
+        Menu createProjectMenu = new Menu(new string[] { "Name", "Submit", "Back" });
+        int selectedIndex = createProjectMenu.DisplayMenu("Please input the project name");
+
+        string name = "";
+
+        bool showMenu = true;
+        while (showMenu)
+        {
+            switch (selectedIndex)
+            {
+                case 0:
+                    name = createProjectMenu.WriteInMenu();
+                    selectedIndex = createProjectMenu.DisplayMenu();
+                    break;
+                case 1:
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        Console.WriteLine("\n\nYou did not input a name!");
+                    }
+                    else
+                    {
+                        PostgresDataAccess.CreateProjectModel(name);
+                        Console.WriteLine($"\nNew Project created with the name {name}");
+                    }
+                    showMenu = false;
+                    break;
+                case 2:
+                    MainMenu();
+                    break;
+            }
+        }
+        Helper.EnterToContinue();
+    }
+
     private static void ShowAllPersons()
     {
         Console.Clear();
@@ -79,9 +115,9 @@ class Program
         var projects = PostgresDataAccess.LoadProjectModel();
         var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
 
-        string[] s = Helper.GetAllPersons();
-        int a = Helper.MenuIndexer(s, "Select a Person to Modify", true);
-        if (a == s.Length) { MainMenu(); }
+        string[] personArray = Helper.GetAllPersons();
+        int personIndex = Helper.MenuIndexer(personArray, "Select a Person to Modify", true);
+        if (personIndex == personArray.Length) { MainMenu(); }
 
         //foreach (var person in persons)
         //{

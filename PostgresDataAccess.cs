@@ -54,4 +54,38 @@ public class PostgresDataAccess
             }
         }
     }
+
+    internal static void CreateProjectModel(string project_name)
+    {
+        using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+        {
+            try
+            {
+                var output = cnn.Query($@"
+                INSERT INTO ika_project (project_name)
+                VALUES ('{project_name}')", new DynamicParameters());
+            }
+            catch (Npgsql.PostgresException e)
+            {
+                Console.WriteLine(e.MessageText);
+            }
+        }
+    }
+
+    internal static void DeletePersonModel(int person_id)
+    {
+        using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+        {
+            try
+            {
+                var output = cnn.Query($@"
+                DELETE FROM ika_person
+                WHERE(ika_person.id = {person_id}", new DynamicParameters());
+            }
+            catch (Npgsql.PostgresException e)
+            {
+                Console.WriteLine(e.MessageText);
+            }
+        }
+    }
 }
