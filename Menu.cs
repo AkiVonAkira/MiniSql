@@ -93,30 +93,14 @@
             _selectedIndex = (_selectedIndex % _menuItems.Length + _menuItems.Length) % _menuItems.Length;
         }
 
-        //public void MoveCursorRight()
-        //{
-        //    int menuItemLength = _menuItems[_selectedIndex].Length + 2;
-        //    for (int i = 0; i < _menuResultText.Count; i++)
-        //    {
-        //        if (_selectedIndex == i)
-        //        {
-        //            menuItemLength += _menuResultText[i].Length + 2;
-        //        }
-        //    }
-        //    Console.CursorLeft = _cursorLeft + menuItemLength;
-        //    Console.CursorTop = _cursorTop + _selectedIndex;
-        //}
-
         public void MoveCursorRight()
         {
             int menuItemLength = _menuItems[_selectedIndex].Length + 2;
-            int numLines = 1;
 
             if (_menuItems[_selectedIndex].Contains("\n"))
             {
                 string[] lines = _menuItems[_selectedIndex].Split('\n');
                 menuItemLength = lines[0].Length + 2;
-                numLines = lines.Length;
             }
             else
             {
@@ -125,7 +109,6 @@
                     if (_selectedIndex == i)
                     {
                         menuItemLength += _menuResultText[i].Length + 2;
-                        numLines = _menuResultText[i].Split('\n').Length;
                         break;
                     }
                 }
@@ -157,51 +140,10 @@
                 }
             }
 
-            int newCursorTop = _cursorTop + totalLines + (numLines > 1 ? 1 : 0);
             Console.CursorLeft = _cursorLeft + menuItemLength;
-            Console.CursorTop = (newCursorTop % Console.WindowHeight);
-
-            //Console.CursorTop = _cursorTop + _selectedIndex * (numLines > 1 ? lines.Length : 1);
-
-            Console.WriteLine($"_selectedIndex: {_selectedIndex}, numLines: {numLines} CURSOR: {Console.CursorTop}");
+            Console.CursorTop = (_cursorTop + totalLines) % Console.WindowHeight;
+            //Console.WriteLine($"_selectedIndex: {_selectedIndex}, totalLines: {totalLines}, CURSOR: {Console.CursorTop}");
         }
-
-        //private void MoveIndexUp()
-        //{
-        //    _selectedIndex--;
-        //    _selectedIndex = Math.Max(0, _selectedIndex);
-        //}
-
-        //private void MoveIndexDown()
-        //{
-        //    _selectedIndex++;
-        //    _selectedIndex = Math.Min(_menuItems.Length - 1, _selectedIndex);
-        //}
-
-        //public void MoveCursorRight()
-        //{
-        //    int menuItemLength = _menuItems[_selectedIndex].Length + 2;
-
-        //    // Add the length of any additional lines of text for this menu item
-        //    if (_menuResultText.Count > _selectedIndex && _menuResultText[_selectedIndex] != null)
-        //    {
-        //        string[] lines = _menuResultText[_selectedIndex].Split('\n');
-        //        menuItemLength += lines.Max(line => line.Length);
-        //    }
-
-        //    // Add the length of any additional lines of text for other menu items above this one
-        //    for (int i = 0; i < _selectedIndex; i++)
-        //    {
-        //        if (_menuResultText.Count > i && _menuResultText[i] != null)
-        //        {
-        //            string[] lines = _menuResultText[i].Split('\n');
-        //            menuItemLength += lines.Max(line => line.Length);
-        //        }
-        //    }
-
-        //    Console.CursorLeft = _cursorLeft + menuItemLength;
-        //    Console.CursorTop = _cursorTop + _selectedIndex;
-        //}
 
         public void MoveCursorLeft()
         {
