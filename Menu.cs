@@ -153,11 +153,23 @@
 
         internal string WriteInMenu()
         {
-            //MoveCursorRight();
+            MoveCursorRight();
             Console.Write(" ↪ ");
             _inputHandler = new InputHandler();
             string userInput = (string)_inputHandler.ReadInput();
             AddMenuResults($"{userInput}", _selectedIndex);
+            _selectedIndex++;
+            MoveCursorRight();
+            return userInput;
+        }
+
+        internal int WriteInMenuNumbers()
+        {
+            MoveCursorRight();
+            Console.Write(" ↪ ");
+            _inputHandler = new InputHandler();
+            int userInput = _inputHandler.ReadNumberInput();
+            AddMenuResults($"{userInput.ToString()}", _selectedIndex);
             _selectedIndex++;
             MoveCursorRight();
             return userInput;

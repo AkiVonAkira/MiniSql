@@ -51,8 +51,8 @@
                 {
                     if (projectPerson.person_id == person.id)
                     {
-                        var project = projects.Find(p => p.id == projectPerson.project_id);
-
+                        var project = projects.Find(proj => proj.id == projectPerson.project_id);
+                        personString += $"{project.project_name}: ";
                         if (project != null)
                         {
                             personString += $"{project.project_name}: {projectPerson.hours} hours\n";
@@ -70,6 +70,13 @@
             }
 
             return results.ToArray();
+        }
+
+        internal static void ResetCursor()
+        {
+            Console.Clear();
+            Console.CursorLeft = 0;
+            Console.CursorTop = 0;
         }
     }
 }

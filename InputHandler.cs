@@ -32,4 +32,31 @@
 
         return userInput;
     }
+
+    public int ReadNumberInput()
+    {
+        ConsoleKeyInfo key;
+        string userInput = "";
+
+        do
+        {
+            key = Console.ReadKey(true);
+
+            if (char.IsDigit(key.KeyChar))
+            {
+                userInput += key.KeyChar;
+                Console.Write(key.KeyChar);
+            }
+            else if (key.Key == ConsoleKey.Backspace && userInput.Length > 0)
+            {
+                userInput = userInput.Substring(0, userInput.Length - 1);
+                Console.Write("\b \b");
+            }
+        }
+        while (key.Key != ConsoleKey.Enter);
+
+        Console.WriteLine();
+
+        return int.Parse(userInput);
+    }
 }
