@@ -120,28 +120,33 @@ class Program
         int projectIndex = Helper.MenuIndexer(projectPersonArray, "Select a project", true);
         if (projectIndex == projectPersonArray.Length) { PersonMenu(); }
 
-        Console.WriteLine($"Selected Person ID: {SelectedPersonID}");
+        int selectedProjectPersonID = projectPersons[projectIndex].id;
+        int selectedProjectID = projectPersons[projectIndex].project_id;
+        var selectedProject = projects.FirstOrDefault(p => p.id == selectedProjectID);
 
-        Console.WriteLine("\nPerson:");
-        Console.WriteLine($"ID: {person.id}");
-        Console.WriteLine($"First Name: {person.person_name}");
-
-        Console.WriteLine("\nProject Persons:");
-        foreach (var pp in projectPersons)
+        if (selectedProject == null)
         {
-            Console.WriteLine($"Project Person ID: {pp.id}");
-            Console.WriteLine($"Project ID: {pp.project_id}");
-            Console.WriteLine($"Person ID: {pp.person_id}");
-            Console.WriteLine($"Hours: {pp.hours}");
-            Console.WriteLine();
+            Console.WriteLine("Project not found");
+            return;
         }
 
-        Console.WriteLine("\nProjects on Person:");
-        foreach (var projectName in projectPersonArray)
-        {
-            Console.WriteLine(projectName);
-        }
+        // Create a new menu so we can write how many hours
+        Menu hourMenu = new Menu(new string[] { "Hours", "Back" });
+        int hourIndex = hourMenu.DisplayMenu("How many hours have you worked on the project?");
+        if (hourIndex == 1) { PersonMenu(); }
+        // This allows us to write only numbers in the menu alternative
+        int hours = hourMenu.WriteInMenuNumbers();
 
+        // create a row in the db with the info we collected above
+        bool success = PostgresDataAccess.UpdateProjectPersonModelHours(selectedProjectPersonID, hours);
+        if (success)
+        {
+            Console.WriteLine($"Changed {selectedProject.project_name} to {hours.ToString()} hours.");
+        }
+        else
+        {
+            Console.WriteLine("Could not update hours. Try again later");
+        }
 
         Helper.EnterToContinue();
     }
