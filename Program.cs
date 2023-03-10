@@ -16,8 +16,8 @@ class Program
             "Edit Person",
             "Create Person",
             "Create Project",
-            "Exit",
-            "Dev Shortcut"
+            "Exit"
+            //,"Dev Shortcut"
         });
         // Display the menu and return the selected menu item index
         int selectedIndex = mainMenu.DisplayMenu("Select an Option");
@@ -78,7 +78,14 @@ class Program
 
     internal static void PersonMenu()
     {
-        Menu personMenu = new Menu(new string[] { "Show All Projects", "Assign Project", "Edit Hours", "Edit Name", "Back" });
+        Menu personMenu = new Menu(new string[]
+        {
+            "Show All Projects",
+            "Assign Project",
+            "Edit Hours",
+            "Edit Name",
+            "Back"
+        });
         int selectedIndex = personMenu.DisplayMenu("Please select an option");
 
         bool showMenu = true;
