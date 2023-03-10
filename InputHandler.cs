@@ -57,6 +57,18 @@
 
         Console.WriteLine();
 
-        return int.Parse(userInput);
+        if (string.IsNullOrEmpty(userInput))
+        {
+            Console.WriteLine("Error: No input detected. Please enter a number.");
+            return ReadNumberInput();
+        }
+
+        if (!int.TryParse(userInput, out int result))
+        {
+            Console.WriteLine("Error: Invalid input. Please enter a valid number.");
+            return ReadNumberInput();
+        }
+
+        return result;
     }
 }

@@ -72,7 +72,7 @@ public class PostgresDataAccess
         }
     }
 
-    internal static void CreateProjectPersonModel(int project_id, int person_id, int hours)
+    internal static bool CreateProjectPersonModel(int project_id, int person_id, int hours)
     {
         using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
         {
@@ -81,10 +81,12 @@ public class PostgresDataAccess
                 var output = cnn.Query($@"
                 INSERT INTO ika_project_person (project_id, person_id, hours)
                 VALUES ('{project_id}', '{person_id}', '{hours}')", new DynamicParameters());
+                return true;
             }
             catch (Npgsql.PostgresException e)
             {
                 Console.WriteLine(e.MessageText);
+                return false;
             }
         }
     }

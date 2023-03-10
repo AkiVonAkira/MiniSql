@@ -124,12 +124,19 @@ class Program
         int hours = hourMenu.WriteInMenuNumbers();
 
         // create a row in the db with the info we collected above
-        PostgresDataAccess.CreateProjectPersonModel(selectedProject_id, SelectedPersonID, hours);
+        bool success = PostgresDataAccess.CreateProjectPersonModel(selectedProject_id, SelectedPersonID, hours);
+        if (success)
+        {
+            Console.WriteLine($"Assigned {projects[selectedProject_id].project_name} with {hours} hours.");
+        }
+        else
+        {
+            Console.WriteLine("Could not assign project to person. Try again later");
+        }
 
-        Helper.ResetCursor();
+        //Helper.ResetCursor();
         // TODO: Fix weird writing here where it cuts off certain words
         // and doesnt show the project name
-        Console.WriteLine($"Assigned {projectArray[projectIndex]} with {hours} hours.");
 
         Helper.EnterToContinue();
     }

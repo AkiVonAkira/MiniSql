@@ -69,6 +69,7 @@
                         MoveIndexDown();
                         break;
                     case ConsoleKey.Enter:
+                        MoveCursorToBottom();
                         return _selectedIndex;
                 }
             } while (true);
@@ -142,6 +143,25 @@
         {
             int newCursorPosition = Math.Max(Console.CursorLeft - 1, 0);
             Console.SetCursorPosition(newCursorPosition, Console.CursorTop);
+        }
+
+        public void MoveCursorToBottom()
+        {
+            int totalLines = 0;
+            for (int i = 0; i < _menuItems.Length; i++)
+            {
+                if (_menuItems[i].Contains("\n"))
+                {
+                    totalLines += _menuItems[i].Split('\n').Length;
+                }
+                else
+                {
+                    totalLines++;
+                }
+            }
+
+            Console.CursorLeft = _cursorLeft;
+            Console.CursorTop = (_cursorTop + totalLines) % Console.WindowHeight;
         }
 
         internal string WriteInMenu()
