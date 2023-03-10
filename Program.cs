@@ -102,7 +102,7 @@ class Program
                     selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 2:
-                    //UpdateHours();
+                    UpdateHours();
                     selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 3:
