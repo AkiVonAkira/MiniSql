@@ -34,6 +34,7 @@ namespace MiniSql
             }
             while (key.Key != ConsoleKey.Enter);
         }
+
         internal static string[] GetAllPersons(bool showAllProjects = false)
         {
             // Load the models from DB
@@ -49,6 +50,7 @@ namespace MiniSql
                 string personString = $"{person.person_name}\n";
 
                 bool hasProjects = false;
+                bool moreProjects = false;
                 int projectCount = 0;
 
                 // Loop through each projectPerson associated with this person
@@ -60,19 +62,17 @@ namespace MiniSql
                     if (project != null)
                     {
                         // Extract the project name from the project and include it in the output string
-                        personString += $"- {project.project_name.Trim()}: {projectPerson.hours} hours\n";
-                        hasProjects = true;
-                        projectCount++;
-
-                        if (!showAllProjects)
+                        if (projectCount < 3 || showAllProjects)
                         {
-                            // Show only 3 projects
-                            if (projectCount > 3)
-                            {
-                                personString += "And more...\n";
-                                break;
-                            }
+                            personString += $"- {project.project_name}: {projectPerson.hours} hours\n";
+                            hasProjects = true;
                         }
+                        else
+                        {
+                            moreProjects = true;
+                        }
+
+                        projectCount++;
                     }
                 }
 
@@ -80,9 +80,50 @@ namespace MiniSql
                 {
                     personString += "This Person has no projects\n";
                 }
+                else if (moreProjects)
+                {
+                    personString += "And more...\n";
+                }
 
                 // Add everything we concatenated in personString to our results List now
                 results.Add(personString);
+            }
+
+            // return our List as an array so we can use it in our menus
+            return results.ToArray();
+        }
+
+        internal static string[] GetAllProjectsOnPerson(int personId)
+        {
+            // Load the models from DB
+            var projects = PostgresDataAccess.LoadProjectModel();
+            var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
+
+            List<string> results = new List<string>();
+
+            // Loop through each projectPerson associated with this person
+            foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == personId))
+            {
+                string projectString = "";
+                bool hasProjects = false;
+
+                // Find the project associated with this projectPerson
+                var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
+
+                if (project != null)
+                {
+                    // Extract the project name from the project and include it in the output string
+                    projectString += $"- {project.project_name}: {projectPerson.hours} hours\n";
+                    hasProjects = true;
+                }
+
+                if (!hasProjects)
+                {
+                    projectString += "This Person has no projects\n";
+                }
+
+                // Add everything we concatenated in personString to our results List now
+                results.Add(projectString);
             }
 
             // return our List as an array so we can use it in our menus

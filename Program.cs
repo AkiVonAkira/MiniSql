@@ -94,6 +94,8 @@ class Program
                     selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 2:
+                    //UpdateHours();
+                    selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 3:
                     break;
@@ -122,7 +124,8 @@ class Program
 
         // Create a new menu so we can write how many hours
         Menu hourMenu = new Menu(new string[] { "Hours", "Back" });
-        int selectedIndex = hourMenu.DisplayMenu("How many hours have you worked on the project?");
+        int hourIndex = hourMenu.DisplayMenu("How many hours have you worked on the project?");
+        if (hourIndex == 1) { PersonMenu(); }
         // This allows us to write only numbers in the menu alternative
         int hours = hourMenu.WriteInMenuNumbers();
 
@@ -130,7 +133,7 @@ class Program
         bool success = PostgresDataAccess.CreateProjectPersonModel(selectedProject_id, SelectedPersonID, hours);
         if (success)
         {
-            Console.WriteLine($"Assigned {projects[selectedProject_id].project_name} with {hours.ToString()} hours.");
+            Console.WriteLine($"Assigned {projects[projectIndex].project_name} with {hours.ToString()} hours.");
         }
         else
         {
@@ -159,56 +162,19 @@ class Program
     private static void ShowAllProjects()
     {
         Console.Clear();
-        // Load the models from DB
-        var persons = PostgresDataAccess.LoadPersonModel();
-        var projects = PostgresDataAccess.LoadProjectModel();
-        var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
 
-        // Find the selected person
-        var selectedPerson = persons.FirstOrDefault(p => p.id == SelectedPersonID);
+        // load the person from the database with our selected person id and get project array
+        var person = PostgresDataAccess.LoadPersonModel().FirstOrDefault(p => p.id == SelectedPersonID);
+        string[] projectArray = Helper.GetAllProjectsOnPerson(SelectedPersonID);
 
-        if (selectedPerson == null)
+        // print the persons name and all of their projects
+        if (person != null)
+            Console.WriteLine($"Projects for {person.person_name}:\n");
+        foreach (var project in projectArray)
         {
-            Console.WriteLine("Invalid person ID");
-            return;
+            Console.WriteLine(project);
         }
 
-        Console.WriteLine($"Projects for {selectedPerson.person_name}:\n".Trim());
-
-        bool hasProjects = false;
-
-        // Loop through each projectPerson associated with this person
-        //foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == SelectedPersonID))
-        //{
-        //    // Find the project associated with this projectPerson
-        //    var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
-
-        //    if (project != null)
-        //    {
-        //        // Extract the project name from the project and include it in the output string
-        //        Console.WriteLine($"{project.project_name}: {projectPerson.hours} hours");
-        //        hasProjects = true;
-        //    }
-        //}
-
-        // Loop through each projectPerson associated with this person
-        foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == SelectedPersonID))
-        {
-            // Find the project associated with this projectPerson
-            var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
-
-            if (project != null)
-            {
-                // Extract the project name from the project and include it in the output string
-                Console.WriteLine($"- {project.project_name}: {projectPerson.hours} hours\n");
-                hasProjects = true;
-            }
-        }
-
-        if (!hasProjects)
-        {
-            Console.WriteLine("This person has no projects.");
-        }
         Helper.EnterToContinue();
     }
 

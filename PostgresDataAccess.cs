@@ -108,6 +108,27 @@ public class PostgresDataAccess
         }
     }
 
+    internal static bool UpdateProjectPersonModelHours(int id, int hours)
+    {
+        using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+        {
+            try
+            {
+                var output = cnn.Execute($@"
+                UPDATE ika_project_person 
+                SET hours = @hours 
+                WHERE id = @id",
+                new { id, hours });
+                return true;
+            }
+            catch (Npgsql.PostgresException e)
+            {
+                Console.WriteLine(e.MessageText);
+                return false;
+            }
+        }
+    }
+
     internal static void PersonModelTrim(List<PersonModel> persons)
     {
         using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))

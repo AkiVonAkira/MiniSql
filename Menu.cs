@@ -4,7 +4,7 @@ internal class Menu
     private readonly string[] _menuItems;
     private int _selectedIndex;
     private List<string> _menuResultText = new List<string>();
-    private string _header;
+    private string? _header;
 
     private int _cursorTop;
     private int _cursorLeft;
