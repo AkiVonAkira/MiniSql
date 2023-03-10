@@ -11,6 +11,7 @@ class Program
 
     internal static void MainMenu()
     {
+        // Initialize Menu object with its options
         Menu mainMenu = new Menu(new string[]
         {
             "Show All Persons",
@@ -20,6 +21,7 @@ class Program
             "Exit",
             "Dev Shortcut"
         });
+        // Display the menu and return the selected menu item index
         int selectedIndex = mainMenu.DisplayMenu("Select an Option");
         bool showMenu = true;
         while (showMenu)
@@ -59,9 +61,15 @@ class Program
     {
         var persons = PostgresDataAccess.LoadPersonModel();
 
+        // Initialize string array with formatted information about the person and their projects
         string[] personArray = Helper.GetAllPersons();
+
+        // Create a menu with all persons and return the selcted person
         int personIndex = Helper.MenuIndexer(personArray, "Select a Person to Modify", true);
+        // if the user presses back, actually go back
         if (personIndex == personArray.Length) { MainMenu(); }
+
+        // get the database id of the person from our selcted index
         int selectedPerson_id = persons[personIndex].id;
         SelectedPersonID = selectedPerson_id;
 
@@ -96,24 +104,37 @@ class Program
 
     private static void AssignProjects()
     {
+        // Load the models from the DB
         var projects = PostgresDataAccess.LoadProjectModel();
         var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
-        string[] projectsArray = projects.Select(project => project.project_name).ToArray();
-        int projectIndex = Helper.MenuIndexer(projectsArray, "Select a project");
+
+        // Get a string array of all the projects from the model
+        string[] projectArray = projects.Select(project => project.project_name).ToArray();
+
+        // Create a menu with all projects an return the selected project
+        int projectIndex = Helper.MenuIndexer(projectArray, "Select a project", true);
+        if (projectIndex == projectArray.Length) { PersonMenu(); }
+
         int selectedProject_id = projects[projectIndex].id;
 
+        // Create a new menu so we can write how many hours
         Menu hourMenu = new Menu(new string[] { "Hours", "Back" });
         int selectedIndex = hourMenu.DisplayMenu("How many hours have you worked on the project?");
+        // This allows us to write only numbers in the menu alternative
         int hours = hourMenu.WriteInMenuNumbers();
 
+        // create a row in the db with the info we collected above
         PostgresDataAccess.CreateProjectPersonModel(selectedProject_id, SelectedPersonID, hours);
 
         Helper.ResetCursor();
-        Console.WriteLine($"Assigned {projectsArray[projectIndex]} with {hours} hours.");
+        // TODO: Fix weird writing here where it cuts off certain words
+        // and doesnt show the project name
+        Console.WriteLine($"Assigned {projectArray[projectIndex]} with {hours} hours.");
 
         Helper.EnterToContinue();
     }
 
+    // Simple method to just show all persons
     private static void ShowAllPersons()
     {
         Console.Clear();

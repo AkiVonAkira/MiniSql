@@ -33,31 +33,75 @@
             while (key.Key != ConsoleKey.Enter);
         }
 
+        //internal static string[] GetAllPersons()
+        //{
+        //    // Load the models from DB
+        //    var persons = PostgresDataAccess.LoadPersonModel();
+        //    var projects = PostgresDataAccess.LoadProjectModel();
+        //    var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
+
+        //    List<string> results = new List<string>();
+
+        //    // Loop through each person
+        //    foreach (var person in persons)
+        //    {
+        //        string personString = $"{person.person_name}\n";
+
+        //        bool hasProjects = false;
+
+        //        // Loop through each projectPerson
+        //        foreach (var projectPerson in projectPersons)
+        //        {
+        //            // Check if the projectPerson has the same id as the same person in this loop
+        //            if (projectPerson.person_id == person.id)
+        //            {
+        //                // Now find the project that is on the person
+        //                var project = projects.Find(proj => proj.id == projectPerson.project_id);
+        //                if (project != null)
+        //                {
+        //                    personString += $"{project.project_name}: {projectPerson.hours} hours\n";
+        //                    hasProjects = true;
+        //                }
+        //            }
+        //        }
+
+        //        if (!hasProjects)
+        //        {
+        //            personString += "This Person has no projects\n";
+        //        }
+        //        // Add everything we concatenated in personString to our resultS List now
+        //        results.Add(personString);
+        //    }
+        //    // return our List as an array so we can use it in our menus
+        //    return results.ToArray();
+        //}
         internal static string[] GetAllPersons()
         {
+            // Load the models from DB
             var persons = PostgresDataAccess.LoadPersonModel();
             var projects = PostgresDataAccess.LoadProjectModel();
             var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
 
             List<string> results = new List<string>();
 
+            // Loop through each person
             foreach (var person in persons)
             {
                 string personString = $"{person.person_name}\n";
 
                 bool hasProjects = false;
 
-                foreach (var projectPerson in projectPersons)
+                // Loop through each projectPerson associated with this person
+                foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == person.id))
                 {
-                    if (projectPerson.person_id == person.id)
+                    // Find the project associated with this projectPerson
+                    var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
+
+                    if (project != null)
                     {
-                        var project = projects.Find(proj => proj.id == projectPerson.project_id);
-                        personString += $"{project.project_name}: ";
-                        if (project != null)
-                        {
-                            personString += $"{project.project_name}: {projectPerson.hours} hours\n";
-                            hasProjects = true;
-                        }
+                        // Extract the project name from the project and include it in the output string
+                        personString += $"{project.project_name}: {projectPerson.hours} hours\n";
+                        hasProjects = true;
                     }
                 }
 
@@ -66,9 +110,11 @@
                     personString += "This Person has no projects\n";
                 }
 
+                // Add everything we concatenated in personString to our results List now
                 results.Add(personString);
             }
 
+            // return our List as an array so we can use it in our menus
             return results.ToArray();
         }
 

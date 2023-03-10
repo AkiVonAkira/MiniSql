@@ -28,6 +28,7 @@
             {
                 Console.Clear();
 
+                // Display and set the header text
                 if (!string.IsNullOrWhiteSpace(header))
                 {
                     Console.WriteLine($"{header}\n");
@@ -43,13 +44,8 @@
                 _cursorLeft = Console.CursorLeft;
                 for (int i = 0; i < _menuItems.Length; i++)
                 {
+                    // Set the color of the current menu item based on whether it's selected or not
                     Console.ForegroundColor = i == _selectedIndex ? ConsoleColor.Green : ConsoleColor.White;
-
-                    int menuItemLines = 1;
-                    if (_menuResultText.Count > i && _menuResultText[i] != null)
-                    {
-                        menuItemLines = _menuResultText[i].Split('\n').Length;
-                    }
 
                     Console.Write($"{(i == _selectedIndex ? "➤ " : " ")}{_menuItems[i]}");
                     // Check if there's any text added to the current menu item and write it
@@ -58,9 +54,6 @@
                         Console.Write($" : {_menuResultText[i]}");
                     }
                     Console.WriteLine();
-
-                    // Update the cursor position to be on the same line as the current menu item
-                    Console.CursorTop -= menuItemLines - 1;
                 }
                 Console.ResetColor();
                 MoveCursorRight();
