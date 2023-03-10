@@ -49,7 +49,8 @@ class Program
                 case 5:
                     SelectedPersonID = 1;
                     //TrimModels();
-                    AssignProjects();
+                    //AssignProjects();
+                    UpdateHours();
                     selectedIndex = mainMenu.DisplayMenu();
                     break;
             }
@@ -104,6 +105,44 @@ class Program
                     break;
             }
         }
+        Helper.EnterToContinue();
+    }
+
+    private static void UpdateHours()
+    {
+        // load the person from the database with our selected person id and get project array
+        var person = PostgresDataAccess.LoadPersonModel().FirstOrDefault(p => p.id == SelectedPersonID);
+        var projects = PostgresDataAccess.LoadProjectModel();
+        var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
+        string[] projectPersonArray = Helper.GetAllProjectsOnPerson(SelectedPersonID);
+
+        // Create a menu with all projects an return the selected project
+        int projectIndex = Helper.MenuIndexer(projectPersonArray, "Select a project", true);
+        if (projectIndex == projectPersonArray.Length) { PersonMenu(); }
+
+        Console.WriteLine($"Selected Person ID: {SelectedPersonID}");
+
+        Console.WriteLine("\nPerson:");
+        Console.WriteLine($"ID: {person.id}");
+        Console.WriteLine($"First Name: {person.person_name}");
+
+        Console.WriteLine("\nProject Persons:");
+        foreach (var pp in projectPersons)
+        {
+            Console.WriteLine($"Project Person ID: {pp.id}");
+            Console.WriteLine($"Project ID: {pp.project_id}");
+            Console.WriteLine($"Person ID: {pp.person_id}");
+            Console.WriteLine($"Hours: {pp.hours}");
+            Console.WriteLine();
+        }
+
+        Console.WriteLine("\nProjects on Person:");
+        foreach (var projectName in projectPersonArray)
+        {
+            Console.WriteLine(projectName);
+        }
+
+
         Helper.EnterToContinue();
     }
 
@@ -165,12 +204,12 @@ class Program
 
         // load the person from the database with our selected person id and get project array
         var person = PostgresDataAccess.LoadPersonModel().FirstOrDefault(p => p.id == SelectedPersonID);
-        string[] projectArray = Helper.GetAllProjectsOnPerson(SelectedPersonID);
+        string[] projectPersonArray = Helper.GetAllProjectsOnPerson(SelectedPersonID);
 
         // print the persons name and all of their projects
         if (person != null)
             Console.WriteLine($"Projects for {person.person_name}:\n");
-        foreach (var project in projectArray)
+        foreach (var project in projectPersonArray)
         {
             Console.WriteLine(project);
         }
