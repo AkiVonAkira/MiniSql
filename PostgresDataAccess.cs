@@ -107,4 +107,22 @@ public class PostgresDataAccess
             }
         }
     }
+
+    internal static void PersonModelTrim(List<PersonModel> persons)
+    {
+        using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+        {
+            var query = "UPDATE ika_person SET person_name = @person_name WHERE id = @Id";
+            cnn.Execute(query, persons);
+        }
+    }
+
+    internal static void ProjectModelTrim(List<ProjectModel> projects)
+    {
+        using (IDbConnection cnn = new NpgsqlConnection(LoadConnectionString()))
+        {
+            var query = "UPDATE ika_project SET project_name = @project_name WHERE id = @Id";
+            cnn.Execute(query, projects);
+        }
+    }
 }

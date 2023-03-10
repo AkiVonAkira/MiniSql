@@ -1,6 +1,8 @@
-﻿namespace MiniSql
+﻿using System.Data;
+
+namespace MiniSql
 {
-    internal class Helper
+    public static class Helper
     {
         // This method returns the index of the selected menu item from an array of strings
         internal static int MenuIndexer(string[] array, string headerText = "", bool hasBack = false)
@@ -32,50 +34,7 @@
             }
             while (key.Key != ConsoleKey.Enter);
         }
-
-        //internal static string[] GetAllPersons()
-        //{
-        //    // Load the models from DB
-        //    var persons = PostgresDataAccess.LoadPersonModel();
-        //    var projects = PostgresDataAccess.LoadProjectModel();
-        //    var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
-
-        //    List<string> results = new List<string>();
-
-        //    // Loop through each person
-        //    foreach (var person in persons)
-        //    {
-        //        string personString = $"{person.person_name}\n";
-
-        //        bool hasProjects = false;
-
-        //        // Loop through each projectPerson
-        //        foreach (var projectPerson in projectPersons)
-        //        {
-        //            // Check if the projectPerson has the same id as the same person in this loop
-        //            if (projectPerson.person_id == person.id)
-        //            {
-        //                // Now find the project that is on the person
-        //                var project = projects.Find(proj => proj.id == projectPerson.project_id);
-        //                if (project != null)
-        //                {
-        //                    personString += $"{project.project_name}: {projectPerson.hours} hours\n";
-        //                    hasProjects = true;
-        //                }
-        //            }
-        //        }
-
-        //        if (!hasProjects)
-        //        {
-        //            personString += "This Person has no projects\n";
-        //        }
-        //        // Add everything we concatenated in personString to our resultS List now
-        //        results.Add(personString);
-        //    }
-        //    // return our List as an array so we can use it in our menus
-        //    return results.ToArray();
-        //}
-        internal static string[] GetAllPersons()
+        internal static string[] GetAllPersons(bool showAllProjects = false)
         {
             // Load the models from DB
             var persons = PostgresDataAccess.LoadPersonModel();
@@ -90,6 +49,7 @@
                 string personString = $"{person.person_name}\n";
 
                 bool hasProjects = false;
+                int projectCount = 0;
 
                 // Loop through each projectPerson associated with this person
                 foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == person.id))
@@ -100,8 +60,19 @@
                     if (project != null)
                     {
                         // Extract the project name from the project and include it in the output string
-                        personString += $"{project.project_name}: {projectPerson.hours} hours\n";
+                        personString += $"- {project.project_name.Trim()}: {projectPerson.hours} hours\n";
                         hasProjects = true;
+                        projectCount++;
+
+                        if (!showAllProjects)
+                        {
+                            // Show only 3 projects
+                            if (projectCount > 3)
+                            {
+                                personString += "And more...\n";
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -123,6 +94,15 @@
             Console.Clear();
             Console.CursorLeft = 0;
             Console.CursorTop = 0;
+        }
+        internal static string FirstCharToUpper(this string input)
+        {
+            switch (input)
+            {
+                case null: throw new ArgumentNullException(nameof(input));
+                case "": throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
+                default: return input[0].ToString().ToUpper() + input.Substring(1);
+            }
         }
     }
 }

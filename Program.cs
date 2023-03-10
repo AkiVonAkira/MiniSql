@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace MiniSql;
+﻿namespace MiniSql;
 class Program
 {
     internal static int SelectedPersonID { get; set; }
@@ -50,6 +48,7 @@ class Program
                     break;
                 case 5:
                     SelectedPersonID = 1;
+                    //TrimModels();
                     AssignProjects();
                     selectedIndex = mainMenu.DisplayMenu();
                     break;
@@ -78,7 +77,7 @@ class Program
 
     internal static void PersonMenu()
     {
-        Menu personMenu = new Menu(new string[] { "Assign Project", "Edit Hours", "Edit Name", "Back" });
+        Menu personMenu = new Menu(new string[] { "Show All Projects", "Assign Project", "Edit Hours", "Edit Name", "Back" });
         int selectedIndex = personMenu.DisplayMenu("Please select an option");
 
         bool showMenu = true;
@@ -87,14 +86,18 @@ class Program
             switch (selectedIndex)
             {
                 case 0:
-                    AssignProjects();
+                    ShowAllProjects();
                     selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 1:
+                    AssignProjects();
+                    selectedIndex = personMenu.DisplayMenu();
                     break;
                 case 2:
                     break;
                 case 3:
+                    break;
+                case 4:
                     MainMenu();
                     break;
             }
@@ -127,16 +130,12 @@ class Program
         bool success = PostgresDataAccess.CreateProjectPersonModel(selectedProject_id, SelectedPersonID, hours);
         if (success)
         {
-            Console.WriteLine($"Assigned {projects[selectedProject_id].project_name} with {hours} hours.");
+            Console.WriteLine($"Assigned {projects[selectedProject_id].project_name} with {hours.ToString()} hours.");
         }
         else
         {
             Console.WriteLine("Could not assign project to person. Try again later");
         }
-
-        //Helper.ResetCursor();
-        // TODO: Fix weird writing here where it cuts off certain words
-        // and doesnt show the project name
 
         Helper.EnterToContinue();
     }
@@ -154,5 +153,79 @@ class Program
         }
 
         Helper.EnterToContinue();
+    }
+
+    // Simple method to just show all projects
+    private static void ShowAllProjects()
+    {
+        Console.Clear();
+        // Load the models from DB
+        var persons = PostgresDataAccess.LoadPersonModel();
+        var projects = PostgresDataAccess.LoadProjectModel();
+        var projectPersons = PostgresDataAccess.LoadProjectPersonModel();
+
+        // Find the selected person
+        var selectedPerson = persons.FirstOrDefault(p => p.id == SelectedPersonID);
+
+        if (selectedPerson == null)
+        {
+            Console.WriteLine("Invalid person ID");
+            return;
+        }
+
+        Console.WriteLine($"Projects for {selectedPerson.person_name}:\n".Trim());
+
+        bool hasProjects = false;
+
+        // Loop through each projectPerson associated with this person
+        //foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == SelectedPersonID))
+        //{
+        //    // Find the project associated with this projectPerson
+        //    var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
+
+        //    if (project != null)
+        //    {
+        //        // Extract the project name from the project and include it in the output string
+        //        Console.WriteLine($"{project.project_name}: {projectPerson.hours} hours");
+        //        hasProjects = true;
+        //    }
+        //}
+
+        // Loop through each projectPerson associated with this person
+        foreach (var projectPerson in projectPersons.Where(pp => pp.person_id == SelectedPersonID))
+        {
+            // Find the project associated with this projectPerson
+            var project = projects.FirstOrDefault(p => p.id == projectPerson.project_id);
+
+            if (project != null)
+            {
+                // Extract the project name from the project and include it in the output string
+                Console.WriteLine($"- {project.project_name}: {projectPerson.hours} hours\n");
+                hasProjects = true;
+            }
+        }
+
+        if (!hasProjects)
+        {
+            Console.WriteLine("This person has no projects.");
+        }
+        Helper.EnterToContinue();
+    }
+
+    internal static void TrimModels()
+    {
+        var persons = PostgresDataAccess.LoadPersonModel();
+        foreach (var person in persons)
+        {
+            person.person_name = person.person_name.Trim();
+        }
+        PostgresDataAccess.PersonModelTrim(persons);
+
+        var projects = PostgresDataAccess.LoadProjectModel();
+        foreach (var project in projects)
+        {
+            project.project_name = project.project_name.Trim();
+        }
+        PostgresDataAccess.ProjectModelTrim(projects);
     }
 }
